@@ -4,8 +4,8 @@ require File.expand_path('../lib/my_emma/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Jeremy Wechsler"]
   gem.email         = ["jeremy@theaterwit.org"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Interface to MyEmma API}
+  gem.summary       = %q{MyEmma Interface}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
@@ -14,5 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "my_emma"
   gem.require_paths = ["lib"]
   gem.version       = MyEmma::VERSION
-  gem.dependency    = 'HTTParty'
+  gem.add_dependency 'json'
+  gem.add_dependency 'httparty', "0.7.8"
+  gem.add_dependency 'crack'
 end

@@ -1,6 +1,6 @@
 # MyEmma
 
-TODO: Write a gem description
+The MyEmma gem gives you an interface into the MyEmma email service.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Description is coming...
 
 ## Contributing
 
