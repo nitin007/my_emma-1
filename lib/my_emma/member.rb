@@ -13,7 +13,8 @@ module MyEmma
 
     def self.custom_attributes(*symbols)
       @@known_attributes.merge(symbols)
-      nil
+      symbols.each { |key| self.class_eval do; attr_accessor "#{key}"; end }
+      self.methods
     end
 
 
@@ -33,6 +34,7 @@ module MyEmma
     def self.find(member_id)
       set_http_values
       g = get("/members/#{member_id}")
+      puts "#{g.to_yaml}"
       if g['error'].nil?
         Member.new(g)
       else
@@ -53,9 +55,11 @@ module MyEmma
       @groups << group if group.id.nil? || !@groups.map {|g| g.member_group_id }.include?(group.id)
     end
 
-    def save
+    def save(add_to_group_ids = nil)
       @groups.each { |group| group.save if group.member_group_id.nil? }
-      self.import_single_member
+      response = self.import_single_member(add_to_group_ids)
+      raise Net::HTTPBadResponse response['error'] unless response['error'].nil?
+      return Member.operation_ok?(response)
     end
 
     protected
@@ -88,13 +92,15 @@ module MyEmma
       result
     end
 
-    def import_single_member
+    def import_single_member(add_to_group_ids = nil)
       Member.set_http_values
+      g_ids = @groups.map {|g| g.member_group_id.to_i }
+      g_ids = g_ids | add_to_group_ids.map{|g| g.to_i} unless add_to_group_ids.nil?
       response = Member.post("/members/add",
                              :body=>{ :email=>self.email,
                                       :fields=>self.fields,
                                       :status_to=>self.status.nil? ? 'a' : self.status,
-                                      :group_ids=>@groups.map{|g| g.member_group_id } }.to_json
+                                      :group_ids=>g_ids }.to_json
                              )
       self.member_id = response['member_id'].to_i
       self.status = response['status']

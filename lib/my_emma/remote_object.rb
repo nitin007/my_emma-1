@@ -22,7 +22,7 @@ module MyEmma
         check_key = key.to_sym
 
         if self.class.api_attributes.include?(check_key)
-          unless self.class.methods.include?(check_key) then
+          unless self.methods.include?(check_key) then
             singleton_class.class_eval do; attr_reader "#{key}"; end
             if self.class.api_attributes.include?(check_key) then
               singleton_class.class_eval do; attr_writer "#{key}"; end
