@@ -7,6 +7,8 @@ module MyEmma
 
     API_ATTRIBUTES = API_ACCESSIBLE + API_PROTECTED
 
+    DYNAMIC_ATTRIBUTES = false
+    
     attr_accessor :group_name
     attr_reader :member_group_id
 
@@ -37,13 +39,33 @@ module MyEmma
       candidates.select { |g| g.group_name == group_name}.first
     end
 
+    def self.find_all_by_member_id(member_id)
+      result = Array.new
+      groups = Member.get("/members/#{member_id}/groups")
+      groups.each { |g| result << Group.new(g) }
+      result
+    end
+
+
     def save
       if self.persisted?
-
+        self.update
       else
         self.create
       end
     end
+
+    protected
+
+    def self.accessible_attributes
+      API_ACCESSIBLE
+    end
+
+    def self.api_attributes
+      API_ATTRIBUTES
+    end
+
+    private
 
     def accessible_to_hash
       result = {}
@@ -56,7 +78,7 @@ module MyEmma
     def create
       Group.set_http_values
       response = Group.post('/groups', :body=> {:groups=>[self.accessible_to_hash]}.to_json)
-      result = self.operation_ok?(response)
+      result = Group.operation_ok?(response)
       @member_group_id = response[0]['member_group_id'] if result
       result
     end
@@ -64,7 +86,7 @@ module MyEmma
     def update
       Group.set_http_values
       response = Group.put("/groups/#{self.member_group_id}", :body=> {:group_name => self.group_name})
-      self.operation_ok?(response)
+      Group.operation_ok?(response)
     end
 
   end

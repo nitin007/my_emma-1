@@ -17,4 +17,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'json'
   gem.add_dependency 'httparty', "0.7.8"
   gem.add_dependency 'crack'
+  gem.add_dependency 'activemodel'
+  gem.add_development_dependency 'pry'
+  gem.add_development_dependency 'httplog'
+  
 end
