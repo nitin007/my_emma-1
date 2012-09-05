@@ -65,8 +65,6 @@ module MyEmma
       API_ATTRIBUTES
     end
 
-    private
-
     def accessible_to_hash
       result = {}
       API_ACCESSIBLE.each do |key| 
