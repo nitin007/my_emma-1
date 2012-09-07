@@ -34,7 +34,6 @@ module MyEmma
     def self.find(member_id)
       set_http_values
       g = get("/members/#{member_id}")
-      puts "#{g.to_yaml}"
       if g['error'].nil?
         Member.new(g)
       else
@@ -68,7 +67,6 @@ module MyEmma
       if attr.has_key?('fields') then
         attr['fields'].each {|k,v| attr[k] = v}
       end
-      puts "#{attr.to_yaml}"
       new_keys = attr.keys.map { |k| k.to_sym }
       new_keys.delete(:fields)
       @@known_attributes.merge(new_keys)
