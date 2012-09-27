@@ -17,7 +17,6 @@ module MyEmma
       self.methods
     end
 
-
     def initialize(attr = {})
       @groups = Array.new
       @groups_lazy_load_required = true
@@ -30,6 +29,32 @@ module MyEmma
       g = get("/members/email/#{email}")
       Member.new(g)
     end
+
+    def self.count
+      set_http_values
+      c = get("/members?count=true").to_i
+    end
+
+    def self.all
+      qty = Member.count
+      remaining = qty
+      start_record = 0
+      result = Array.new
+      end_record = [499, qty].max
+      while remaining > 0
+        members = get("/members?start=#{start_record}&end=#{end_record}")
+
+        members.each { |m|
+           puts "#{m.to_yaml}"
+           result << Member.new(m)
+         }
+        remaining = remaining - (end_record - start_record + 1)
+        start_record = end_record + 1
+        end_record = [start_record + 499, qty].max
+      end
+      members
+    end
+
 
     def self.find(member_id)
       set_http_values
@@ -44,7 +69,7 @@ module MyEmma
     def groups(reload = false)
       if (reload || @groups_lazy_load_required) && !self.member_id.nil?
         @api_groups = Group.find_all_by_member_id(self.member_id)
-        @api_groups.each {|g| @groups << g unless @groups.map {|g1| g1.member_group_id }.include?(g.id) } 
+        @api_groups.each {|g| @groups << g unless @groups.map {|g1| g1.member_group_id }.include?(g.id) }
         @groups_lazy_load_required = false
       end
       @groups
