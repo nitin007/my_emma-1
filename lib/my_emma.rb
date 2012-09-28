@@ -11,8 +11,8 @@ module MyEmma
    def self.root
     File.expand_path '../..', __FILE__
   end
-  
- 
+
+
   def self.set_credentials(username, password, account_id)
     @@username = username
     @@password = password
@@ -29,14 +29,12 @@ module MyEmma
     #@@username = '89a1c1a1bc1d17da699e'
     #@@password = '638eb64020106e4d5135'
     #@@account_id = 1402458
-  
-  end
 
- 
+  end
 
   def self.initialize_emma_objects
     Group.basic_auth @@username, @@password
-    Group.base_uri 
+    Group.base_uri
   end
 
 
@@ -56,6 +54,12 @@ module MyEmma
     "https://api.e2ma.net/#{@@account_id}"
   end
 
-  
+  def self.disable
+    @@account_id = nil
+  end
+
+  def self.disabled?
+    @@account_id.blank?
+  end
 
 end

@@ -36,25 +36,28 @@ module MyEmma
     end
 
     def self.all
-      qty = Member.count
-      remaining = qty
+      self.get_all_in_slices('/members',Member.count)
+    end
+
+    def self.get_all_in_slices(base_url,total)
+      set_http_values
+      remaining = total
       start_record = 0
       result = Array.new
-      end_record = [499, qty].max
+      end_record = [499, total].min
       while remaining > 0
-        members = get("/members?start=#{start_record}&end=#{end_record}")
+        members = get("#{base_url}?start=#{start_record}&end=#{end_record}")
 
         members.each { |m|
-           puts "#{m.to_yaml}"
            result << Member.new(m)
          }
         remaining = remaining - (end_record - start_record + 1)
         start_record = end_record + 1
-        end_record = [start_record + 499, qty].max
+        end_record = [start_record + 499, total].min
+        puts "new slice: #{start_record}, #{end_record} with #{remaining} left. Parsed #{members.size}"
       end
-      members
+      result
     end
-
 
     def self.find(member_id)
       set_http_values
@@ -86,6 +89,14 @@ module MyEmma
       return Member.operation_ok?(response)
     end
 
+    def self.api_attributes
+      @@known_attributes
+    end
+
+    def active?
+      @status == "active"
+    end
+
     protected
 
     def self.load_attributes(attr)
@@ -103,9 +114,6 @@ module MyEmma
       @@accessible_attributes
     end
 
-    def self.api_attributes
-      @@known_attributes
-    end
 
     def fields
       result = Hash.new

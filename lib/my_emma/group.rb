@@ -8,7 +8,7 @@ module MyEmma
     API_ATTRIBUTES = API_ACCESSIBLE + API_PROTECTED
 
     DYNAMIC_ATTRIBUTES = false
-    
+
     attr_accessor :group_name
     attr_reader :member_group_id
 
@@ -17,7 +17,7 @@ module MyEmma
     end
 
     def id
-      self.member_group_id  
+      self.member_group_id
     end
 
     def self.all(options = {})
@@ -46,6 +46,10 @@ module MyEmma
       result
     end
 
+    def members
+      Member.get_all_in_slices("/groups/#{self.member_group_id}/members", self.active_count+self.optout_count+self.error_count)
+    end
+
 
     def save
       if self.persisted?
@@ -55,19 +59,20 @@ module MyEmma
       end
     end
 
+    def self.api_attributes
+      API_ATTRIBUTES
+    end
+
+
     protected
 
     def self.accessible_attributes
       API_ACCESSIBLE
     end
 
-    def self.api_attributes
-      API_ATTRIBUTES
-    end
-
     def accessible_to_hash
       result = {}
-      API_ACCESSIBLE.each do |key| 
+      API_ACCESSIBLE.each do |key|
         result[key] = instance_variable_get("@#{key}") if self.respond_to? key
       end
       result
