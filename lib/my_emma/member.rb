@@ -19,6 +19,7 @@ module MyEmma
 
     def initialize(attr = {})
       @groups = Array.new
+      @drop_groups = Array.new
       @groups_lazy_load_required = true
       attr = Member.load_attributes(attr)
       super(attr)
@@ -27,7 +28,11 @@ module MyEmma
     def self.find_by_email(email)
       set_http_values
       g = get("/members/email/#{email}")
-      Member.new(g)
+      if g['error'].blank?
+        m = Member.new(g)
+      else
+        nil
+      end
     end
 
     def self.count
@@ -79,7 +84,12 @@ module MyEmma
     end
 
     def add_group(group)
-      @groups << group if group.id.nil? || !@groups.map {|g| g.member_group_id }.include?(group.id)
+      self.groups << group if group.id.nil? || !@groups.map {|g| g.member_group_id }.include?(group.id)
+    end
+
+    def remove_group(group)
+      self.groups.delete(group)
+      @drop_groups << group
     end
 
     def save(add_to_group_ids = nil)
