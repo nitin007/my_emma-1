@@ -46,6 +46,18 @@ module MyEmma
       result
     end
 
+    def remove_members(m)
+      if m.is_a? Array
+        members = m
+      else
+        members = [m]
+      end
+      Group.set_http_values
+      response = Group.post('/groups/#{member_group_id}/members/remove', :body=> {:member_ids=>members.map{|member| member.member_id}}.to_json)
+      result = Group.operation_ok?(response)
+    end
+
+
     def members
       Member.get_all_in_slices("/groups/#{self.member_group_id}/members", self.active_count+self.optout_count+self.error_count)
     end
@@ -77,6 +89,7 @@ module MyEmma
       end
       result
     end
+
 
     def create
       Group.set_http_values
