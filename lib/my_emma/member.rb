@@ -92,7 +92,13 @@ module MyEmma
       @drop_groups << group
     end
 
-    def save(add_to_group_ids = nil)
+    def save(groups = nil)
+      add_to_group_ids = Array.new
+      add_to_group_ids = groups.map { |g| if g.is_a? Group
+        g.group_member_id
+      else
+        g.to_i
+      end } unless groups.nil?
       @groups.each { |group| group.save if group.member_group_id.nil? }
       response = self.import_single_member(add_to_group_ids)
       raise Net::HTTPBadResponse response['error'] unless response['error'].nil?
